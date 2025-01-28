@@ -13,7 +13,7 @@
 | Member2     |     Nischay Singh      |
 | Member2     |  nischay2@illinois.edu |
 | Member3     |      Aditya Saxena     |
-| Member3     |      saxena11          |
+| Member3     | saxena11@illinois.edu  |
 
 ## Project Information
 
