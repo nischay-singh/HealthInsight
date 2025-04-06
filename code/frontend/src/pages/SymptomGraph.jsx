@@ -10,21 +10,32 @@ export default function SymptomGraph() {
   const handleSearch = async () => {
     if (keyword.trim() !== "") {
       try {
-        const response = await fetch("http://localhost:5000/api/symptomgraph", {
-          method:"POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({keyword}),
-        })
-        const data = await response.json();
-        console.log("received data from backend", data);
+        console.log(keyword)
 
+        const response = await fetch("/api/symptomGraph", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ keyword }),
+        });
+  
+        // Check if response is ok (status 200–299)
+        if (!response.ok) {
+          const errorText = await response.text(); // Read raw error (could be HTML)
+          throw new Error(`Server responded with status ${response.status}: ${errorText}`);
+        }
+  
+        const data = await response.json();
+        console.log("Received data from backend:", data);
+  
         setShowMessage(true);
-      }
-      catch(error){
-        console.log("Error fetching data: ", error);
+      } catch (error) {
+        console.error("Error fetching data:", error.message || error);
       }
     }
   };
+  
 
   return (
     <main className="min-h-screen bg-background">
