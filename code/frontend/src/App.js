@@ -1,11 +1,36 @@
-import './App.css';
+import React from "react";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Home from "./pages/Home";
+import Chatbot from "./pages/Chatbot";
+import PatientSearch from "./pages/PatientSearch";
+import SymptomGraph from "./pages/SymptomGraph";
+import ErrorPage from "./pages/ErrorPage";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/chatbot",
+    element: <Chatbot />,
+  },
+  {
+    path: "/patient-search",
+    element: <PatientSearch />,
+  },
+  {
+    path: "/symptom-graph",
+    element: <SymptomGraph />,
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
+]);
 
 function App() {
-  return (
-    <div className="min-h-screen bg-yellow-100 flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-yellow-800">Tailwind is finally working 🎉</h1>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
