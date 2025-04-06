@@ -12,16 +12,16 @@ export default function Home() {
           Empowering patients with accessible healthcare information through interactive tools and AI-powered
           assistance.
         </p>
-        <div className="space-x-4">
-          <Button size="lg" asChild>
-            <a href="/patient-search">Explore Patient Data</a>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <a href="/symptom-graph">View Symptom Graph</a>
-          </Button>
-          <Button size="lg" variant="secondary" asChild>
-            <a href="/chatbot">Chat with AI</a>
-          </Button>
+        <div className="space-x-10 p-6 mt-20">
+        <Button size="lg" className="px-6 py-8 text-xl rounded-xl" asChild>
+          <a href="/patient-search">Explore Patient Data</a>
+        </Button>
+        <Button size="lg" variant="outline" className="px-6 py-8 text-xl rounded-xl" asChild>
+          <a href="/symptom-graph">View Symptom Graph</a>
+        </Button>
+        <Button size="lg" variant="secondary" className="px-7 py-8 text-xl rounded-xl" asChild>
+          <a href="/chatbot">Chat with AI</a>
+        </Button>
         </div>
       </div>
     </main>

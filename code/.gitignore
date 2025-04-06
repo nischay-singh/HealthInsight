@@ -4,8 +4,8 @@
 /frontend/.env
 
 # Backend
-/server/node_modules/
-/server/.env
+/backend/node_modules/
+/backend/.env
 
 # General
 .env
