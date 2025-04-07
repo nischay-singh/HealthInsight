@@ -13,7 +13,7 @@ export default function SymptomGraph() {
   const handleSearch = async () => {
     if (keyword.trim() !== "") {
       try {
-        /* const response = await fetch("/api/symptomGraph", {
+        const response = await fetch("/api/symptomGraph", {
           method: "POST",
           headers: {"Content-Type": "application/json",},
           body: JSON.stringify({ keyword }),
@@ -23,33 +23,7 @@ export default function SymptomGraph() {
           throw new Error(`Server responded with status ${response.status}: ${errorText}`);
         }
   
-        const data = await response.json(); */
-        const data = [
-          { DoctorSpecialty: "General Medicine", NumRecords: 41 },
-          { DoctorSpecialty: "Consult - History and Phy.", NumRecords: 40 },
-          { DoctorSpecialty: "SOAP / Chart / Progress Notes", NumRecords: 30 },
-          { DoctorSpecialty: "Discharge Summary", NumRecords: 14 },
-          { DoctorSpecialty: "Surgery", NumRecords: 11 },
-          { DoctorSpecialty: "Urology", NumRecords: 11 },
-          { DoctorSpecialty: "Gastroenterology", NumRecords: 11 },
-          { DoctorSpecialty: "Emergency Room Reports", NumRecords: 10 },
-          { DoctorSpecialty: "Hematology - Oncology", NumRecords: 9 },
-          { DoctorSpecialty: "Nephrology", NumRecords: 8 },
-          { DoctorSpecialty: "Cardiovascular / Pulmonary", NumRecords: 8 },
-          { DoctorSpecialty: "Pain Management", NumRecords: 7 },
-          { DoctorSpecialty: "Office Notes", NumRecords: 7 },
-          { DoctorSpecialty: "Neurology", NumRecords: 7 },
-          { DoctorSpecialty: "Radiology", NumRecords: 6 },
-          { DoctorSpecialty: "Gastroenbterology", NumRecords: 11 },
-          { DoctorSpecialty: "Emergency Room Reports", NumRecords: 10 },
-          { DoctorSpecialty: "Hematowlogy - Oncology", NumRecords: 3 },
-          { DoctorSpecialty: "ef", NumRecords: 5 },
-          { DoctorSpecialty: "e / Pulmonary", NumRecords: 1 },
-          { DoctorSpecialty: "Pain Magnagemfgent", NumRecords: 21 },
-          { DoctorSpecialty: "Office Nfwotees", NumRecords: 13 },
-          { DoctorSpecialty: "Neurolofgy", NumRecords: 15 },
-          { DoctorSpecialty: "Radiolggogy", NumRecords: 23 }
-        ];
+        const data = await response.json();
         console.log("Received data from backend:", data);    
         setGraphData(data);
         setFormattedWords(data.map(item => [item.DoctorSpecialty.trim().toUpperCase(), item.NumRecords]));
