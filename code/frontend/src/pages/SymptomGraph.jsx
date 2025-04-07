@@ -2,33 +2,58 @@ import React, { useState } from "react";
 import { Navbar } from "../components/ui/navbar";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import SymptomWordCloud from "../components/ui/SymptomWordCloud";
 
 export default function SymptomGraph() {
   const [keyword, setKeyword] = useState("");
   const [showMessage, setShowMessage] = useState(false);
+  const [graphData, setGraphData] = useState([]);
+  const [formattedWords, setFormattedWords] = useState([]);
 
   const handleSearch = async () => {
     if (keyword.trim() !== "") {
       try {
-        console.log(keyword)
-
-        const response = await fetch("/api/symptomGraph", {
+        /* const response = await fetch("/api/symptomGraph", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: {"Content-Type": "application/json",},
           body: JSON.stringify({ keyword }),
         });
-  
-        // Check if response is ok (status 200–299)
         if (!response.ok) {
-          const errorText = await response.text(); // Read raw error (could be HTML)
+          const errorText = await response.text();
           throw new Error(`Server responded with status ${response.status}: ${errorText}`);
         }
   
-        const data = await response.json();
-        console.log("Received data from backend:", data);
-  
+        const data = await response.json(); */
+        const data = [
+          { DoctorSpecialty: "General Medicine", NumRecords: 41 },
+          { DoctorSpecialty: "Consult - History and Phy.", NumRecords: 40 },
+          { DoctorSpecialty: "SOAP / Chart / Progress Notes", NumRecords: 30 },
+          { DoctorSpecialty: "Discharge Summary", NumRecords: 14 },
+          { DoctorSpecialty: "Surgery", NumRecords: 11 },
+          { DoctorSpecialty: "Urology", NumRecords: 11 },
+          { DoctorSpecialty: "Gastroenterology", NumRecords: 11 },
+          { DoctorSpecialty: "Emergency Room Reports", NumRecords: 10 },
+          { DoctorSpecialty: "Hematology - Oncology", NumRecords: 9 },
+          { DoctorSpecialty: "Nephrology", NumRecords: 8 },
+          { DoctorSpecialty: "Cardiovascular / Pulmonary", NumRecords: 8 },
+          { DoctorSpecialty: "Pain Management", NumRecords: 7 },
+          { DoctorSpecialty: "Office Notes", NumRecords: 7 },
+          { DoctorSpecialty: "Neurology", NumRecords: 7 },
+          { DoctorSpecialty: "Radiology", NumRecords: 6 },
+          { DoctorSpecialty: "Gastroenbterology", NumRecords: 11 },
+          { DoctorSpecialty: "Emergency Room Reports", NumRecords: 10 },
+          { DoctorSpecialty: "Hematowlogy - Oncology", NumRecords: 3 },
+          { DoctorSpecialty: "ef", NumRecords: 5 },
+          { DoctorSpecialty: "e / Pulmonary", NumRecords: 1 },
+          { DoctorSpecialty: "Pain Magnagemfgent", NumRecords: 21 },
+          { DoctorSpecialty: "Office Nfwotees", NumRecords: 13 },
+          { DoctorSpecialty: "Neurolofgy", NumRecords: 15 },
+          { DoctorSpecialty: "Radiolggogy", NumRecords: 23 }
+        ];
+        console.log("Received data from backend:", data);    
+        setGraphData(data);
+        setFormattedWords(data.map(item => [item.DoctorSpecialty.trim().toUpperCase(), item.NumRecords]));
+        console.log(data.map(item => [item.DoctorSpecialty.trim().toUpperCase(), item.NumRecords]))
         setShowMessage(true);
       } catch (error) {
         console.error("Error fetching data:", error.message || error);
@@ -59,13 +84,33 @@ export default function SymptomGraph() {
           <Button onClick={handleSearch}>Search</Button>
         </div>
 
-        {showMessage && <div className="bg-secondary aspect-video rounded-lg flex items-center justify-center">
-            <p className="text-xl text-muted-foreground text-center px-4">
-              Showing results for: <span className="font-semibold">{keyword}</span>
-              <br />
-              (Graph data will appear here in future)
-            </p>
-        </div>}
+        {showMessage && (
+          <div className="text-center text-muted-foreground px-4">
+            <p className="text-xl mb-4"> Showing results for: <span className="font-semibold">{keyword}</span></p>
+
+    {graphData && (
+      <div className="overflow-x-auto mx-auto">
+        {/* <table className="min-w-full bg-secondary rounded-lg overflow-hidden shadow-md">
+          <thead>
+            <tr className="text-left bg-primary text-primary-foreground">
+              <th className="py-3 px-4">Doctor Specialty</th>
+              <th className="py-3 px-4">Matching Records</th>
+            </tr>
+          </thead>
+          <tbody>
+            {graphData.map((item, idx) => (
+              <tr key={idx} className="border-t border-muted">
+                <td className="py-2 px-4">{item.DoctorSpecialty}</td>
+                <td className="py-2 px-4">{item.NumRecords}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table> */}
+        <SymptomWordCloud words = {formattedWords} />
+      </div>
+    )}
+  </div>
+)}
       </div>
     </main>
   );
