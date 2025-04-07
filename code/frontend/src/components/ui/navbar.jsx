@@ -14,10 +14,10 @@ export function Navbar() {
             <Link to="/">Home</Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link to="/patient-search">Patient Search</Link>
+            <Link to="/patient-search">Patient Symptom Search</Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link to="/symptom-graph">Symptom Graph</Link>
+            <Link to="/symptom-graph">Doctor Speciality Analysis</Link>
           </Button>
           <Button variant="ghost" asChild>
             <Link to="/chatbot">Chatbot</Link>

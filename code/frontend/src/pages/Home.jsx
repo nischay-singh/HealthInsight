@@ -14,10 +14,10 @@ export default function Home() {
         </p>
         <div className="space-x-10 p-6 mt-20">
         <Button size="lg" className="px-6 py-8 text-xl rounded-xl" asChild>
-          <a href="/patient-search">Explore Patient Data</a>
+          <a href="/patient-search">Explore Patient Symptom Data</a>
         </Button>
         <Button size="lg" variant="outline" className="px-6 py-8 text-xl rounded-xl" asChild>
-          <a href="/symptom-graph">View Symptom Graph</a>
+          <a href="/symptom-graph">View Doctor Speciality Graph</a>
         </Button>
         <Button size="lg" variant="secondary" className="px-7 py-8 text-xl rounded-xl" asChild>
           <a href="/chatbot">Chat with AI</a>
