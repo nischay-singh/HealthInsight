@@ -6,15 +6,14 @@ export default function SymptomWordCloud({words}) {
   
   useEffect(() => {
     if (canvasRef.current && words && words.length > 0) {
-      // Clear the canvas before rendering new words
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       WordCloud(canvasRef.current, {
         list: words,
-        gridSize: 6,               // force int
-        weightFactor: (size) => Math.min(size * 2.5, 70),     // custom scaler
+        gridSize: 6,
+        weightFactor: (size) => Math.min(size * 2.5, 70),
         fontFamily: "Inter, sans-serif",
         color: () => {
             const colors = [
@@ -29,7 +28,7 @@ export default function SymptomWordCloud({words}) {
         origin: [600, 450],
       });
     }
-  }, [words]); // Add words to the dependency array
+  }, [words]);
 
   return (
     <div className="flex justify-center my-6">

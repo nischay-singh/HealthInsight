@@ -4,19 +4,16 @@ import mysql.connector
 from dotenv import load_dotenv
 from typing import List, Dict, Any
 
-# Load environment variables
 load_dotenv()
 
 class MedicalSearch:
     def __init__(self):
-        # Initialize Elasticsearch client
         self.es = Elasticsearch(
             os.getenv('ELASTICSEARCH_URL'),
             basic_auth=(os.getenv('ELASTICSEARCH_USER'), os.getenv('ELASTICSEARCH_PASSWORD')),
-            verify_certs=False  # For local development only
+            verify_certs=False
         )
         
-        # Initialize MySQL connection
         self.mysql_conn = mysql.connector.connect(
             host=os.getenv('MYSQL_HOST'),
             port=os.getenv('MYSQL_PORT'),
@@ -103,15 +100,12 @@ class MedicalSearch:
         self.mysql_conn.close()
         self.es.close()
 
-# Example usage
 if __name__ == "__main__":
     search = MedicalSearch()
     try:
-        # Create index and sync data
         search.create_index()
         search.sync_data()
         
-        # Example search
         results = search.search("fever and cough")
         for result in results:
             print("\nVisit Description:", result['visit_description'])

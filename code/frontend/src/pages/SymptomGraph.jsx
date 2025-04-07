@@ -45,13 +45,11 @@ export default function SymptomGraph() {
       
       setGraphData(data);
       
-      // Check if there are any results
       if (data.results.length === 0) {
         setHasResults(false);
         setFormattedWords([]);
       } else {
         setHasResults(true);
-        // Add error handling for missing specialty property
         const formattedWords = data.results.map(item => {
           const specialty = item.specialty || 'Unknown Specialty';
           const count = item.count || 0;
