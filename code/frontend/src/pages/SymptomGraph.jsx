@@ -7,7 +7,7 @@ import SymptomWordCloud from "../components/ui/SymptomWordCloud";
 export default function SymptomGraph() {
   const [keyword, setKeyword] = useState("");
   const [showMessage, setShowMessage] = useState(false);
-  const [graphData, setGraphData] = useState([]);
+  //const [graphData, setGraphData] = useState([]);
   const [formattedWords, setFormattedWords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,8 +42,6 @@ export default function SymptomGraph() {
       if (!data.results || !Array.isArray(data.results)) {
         throw new Error('Invalid data format received from backend');
       }
-      
-      setGraphData(data);
       
       if (data.results.length === 0) {
         setHasResults(false);
