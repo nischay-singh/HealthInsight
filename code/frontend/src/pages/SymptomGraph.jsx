@@ -26,8 +26,8 @@ export default function SymptomGraph() {
         const data = await response.json();
         console.log("Received data from backend:", data);    
         setGraphData(data);
-        setFormattedWords(data.map(item => [item.DoctorSpecialty.trim().toUpperCase(), item.NumRecords]));
-        console.log(data.map(item => [item.DoctorSpecialty.trim().toUpperCase(), item.NumRecords]))
+        setFormattedWords(data.map(item => [item.speciality.trim().toUpperCase(), item.count]));
+        console.log(data.map(item => [item.speciality.trim().toUpperCase(), item.count]))
         setShowMessage(true);
       } catch (error) {
         console.error("Error fetching data:", error.message || error);
