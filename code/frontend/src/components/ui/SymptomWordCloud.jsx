@@ -3,8 +3,14 @@ import WordCloud from "wordcloud";
 
 export default function SymptomWordCloud({words}) {
   const canvasRef = useRef();
+  
   useEffect(() => {
-    if (canvasRef.current) {
+    if (canvasRef.current && words && words.length > 0) {
+      // Clear the canvas before rendering new words
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
       WordCloud(canvasRef.current, {
         list: words,
         gridSize: 6,               // force int
@@ -23,7 +29,7 @@ export default function SymptomWordCloud({words}) {
         origin: [600, 450],
       });
     }
-  }, []);
+  }, [words]); // Add words to the dependency array
 
   return (
     <div className="flex justify-center my-6">

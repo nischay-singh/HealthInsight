@@ -9,32 +9,74 @@ export default function SymptomGraph() {
   const [showMessage, setShowMessage] = useState(false);
   const [graphData, setGraphData] = useState([]);
   const [formattedWords, setFormattedWords] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasResults, setHasResults] = useState(true);
 
   const handleSearch = async () => {
-    if (keyword.trim() !== "") {
-      try {
-        const response = await fetch("/api/symptomGraph", {
-          method: "POST",
-          headers: {"Content-Type": "application/json",},
-          body: JSON.stringify({ keyword }),
-        });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Server responded with status ${response.status}: ${errorText}`);
-        }
-  
-        const data = await response.json();
-        console.log("Received data from backend:", data);    
-        setGraphData(data);
-        setFormattedWords(data.map(item => [item.speciality.trim().toUpperCase(), item.count]));
-        console.log(data.map(item => [item.speciality.trim().toUpperCase(), item.count]))
-        setShowMessage(true);
-      } catch (error) {
-        console.error("Error fetching data:", error.message || error);
+    if (!keyword.trim()) {
+      setError("Please enter a keyword to search");
+      setHasResults(false);
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/symptomGraph', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ keyword: keyword }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      console.log("Received data from backend:", data);
+      
+      if (!data.results || !Array.isArray(data.results)) {
+        throw new Error('Invalid data format received from backend');
+      }
+      
+      setGraphData(data);
+      
+      // Check if there are any results
+      if (data.results.length === 0) {
+        setHasResults(false);
+        setFormattedWords([]);
+      } else {
+        setHasResults(true);
+        // Add error handling for missing specialty property
+        const formattedWords = data.results.map(item => {
+          const specialty = item.specialty || 'Unknown Specialty';
+          const count = item.count || 0;
+          return [specialty.trim().toUpperCase(), count];
+        });
+        
+        setFormattedWords(formattedWords);
+        console.log("Formatted words:", formattedWords);
+      }
+      
+      setShowMessage(true);
+    } catch (error) {
+      console.error("Error fetching data:", error.message || error);
+      setError(error.message || 'An error occurred while fetching data');
+      setHasResults(false);
+    } finally {
+      setLoading(false);
     }
   };
   
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -54,37 +96,33 @@ export default function SymptomGraph() {
             placeholder="Enter keyword (e.g., fever)"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
+            onKeyPress={handleKeyPress}
           />
-          <Button onClick={handleSearch}>Search</Button>
+          <Button onClick={handleSearch} disabled={loading}>
+            {loading ? "Searching..." : "Search"}
+          </Button>
         </div>
+
+        {error && (
+          <div className="text-center text-red-500 mb-4">
+            <p>{error}</p>
+          </div>
+        )}
 
         {showMessage && (
           <div className="text-center text-muted-foreground px-4">
-            <p className="text-xl mb-4"> Showing results for: <span className="font-semibold">{keyword}</span></p>
-
-    {graphData && (
-      <div className="overflow-x-auto mx-auto">
-        {/* <table className="min-w-full bg-secondary rounded-lg overflow-hidden shadow-md">
-          <thead>
-            <tr className="text-left bg-primary text-primary-foreground">
-              <th className="py-3 px-4">Doctor Specialty</th>
-              <th className="py-3 px-4">Matching Records</th>
-            </tr>
-          </thead>
-          <tbody>
-            {graphData.map((item, idx) => (
-              <tr key={idx} className="border-t border-muted">
-                <td className="py-2 px-4">{item.DoctorSpecialty}</td>
-                <td className="py-2 px-4">{item.NumRecords}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table> */}
-        <SymptomWordCloud words = {formattedWords} />
-      </div>
-    )}
-  </div>
-)}
+            <p className="text-xl mb-4">Showing results for: <span className="font-semibold">{keyword}</span></p>
+            
+            {hasResults ? (
+              <SymptomWordCloud words={formattedWords} />
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-xl text-muted-foreground">No results found for "{keyword}"</p>
+                <p className="text-muted-foreground">Try a different keyword</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
