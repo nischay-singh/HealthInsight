@@ -43,12 +43,26 @@ class MedicalSearch:
                             "type": "text",
                             "analyzer": "english"
                         },
-                        "Keywords": {"type": "keyword"}
+                        "Keywords": {"type": "keyword"}, 
+                        "Upvotes": {"type": "integer"}
                     }
                 }
             }
             self.es.indices.create(index=self.index_name, body=mappings)
             print(f"Created index {self.index_name}")
+    def update_upvotes(self, record_id: str, new_upvotes: int):
+        """Update upvotes in Elasticsearch for a given record"""
+        print("Your mom")
+        self.es.update(
+            index=self.index_name,
+            id=record_id,
+            body={
+                "doc": {
+                    "Upvotes": new_upvotes
+                }
+            }
+        )
+
     
     def sync_data(self):
         """Sync data from MySQL to Elasticsearch"""
@@ -90,7 +104,9 @@ class MedicalSearch:
                 'visit_description': source['VisitDescription'],
                 'doctor_specialty': source['DoctorSpecialty'],
                 'medical_transcription': source['MedicalTranscription'],
-                'score': hit['_score']
+                'score': hit['_score'],
+                'upvotes': source.get('Upvotes', 0),
+                'recordId': source['RecordID']
             })
         
         return results

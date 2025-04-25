@@ -31,7 +31,6 @@ def search():
     try:
         search = MedicalSearch()
         results = search.search(query)
-        print(results)
         return jsonify({'results': results})
     except Exception as e:
         print(f"Search error: {str(e)}")
@@ -39,6 +38,87 @@ def search():
     finally:
         if 'search' in locals():
             search.close()
+
+@app.route("/api/upvote", methods=["POST"])
+def upvote_record():
+    try:
+        record_id = request.args.get('id', '')
+        print(record_id)
+        if not record_id:
+            return jsonify({"error": "Missing recordId"}), 400
+
+        cursor = mysql_conn.cursor()
+
+        update_query = """
+            UPDATE Patient_Diagnosis_Records
+            SET Upvotes = Upvotes + 1
+            WHERE RecordID = %s
+        """
+        cursor.execute(update_query, (record_id,))
+        mysql_conn.commit()
+
+        select_query = """
+            SELECT Upvotes FROM Patient_Diagnosis_Records
+            WHERE RecordID = %s
+        """
+        cursor.execute(select_query, (record_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({"error": "Record not found"}), 404
+
+        new_upvotes = row[0]
+
+        search = MedicalSearch()
+        search.update_upvotes(record_id, new_upvotes)
+        search.close()
+
+        return jsonify({"message": "Upvote recorded successfully", "new_upvotes": new_upvotes}), 200
+
+    except Exception as e:
+        print(f"Upvote error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/downvote", methods=["POST"])
+def downvote_record():
+    try:
+        record_id = request.args.get('id', '')
+        if not record_id:
+            return jsonify({"error": "Missing recordId"}), 400
+
+        cursor = mysql_conn.cursor()
+
+        update_query = """
+            UPDATE Patient_Diagnosis_Records
+            SET Upvotes = CASE WHEN Upvotes > 0 THEN Upvotes - 1 ELSE 0 END
+            WHERE RecordID = %s
+        """
+        cursor.execute(update_query, (record_id,))
+        mysql_conn.commit()
+
+        select_query = """
+            SELECT Upvotes FROM Patient_Diagnosis_Records
+            WHERE RecordID = %s
+        """
+        cursor.execute(select_query, (record_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({"error": "Record not found"}), 404
+
+        new_upvotes = row[0]
+
+        search = MedicalSearch()
+        search.update_upvotes(record_id, new_upvotes)
+        search.close()
+
+        return jsonify({"message": "Downvote recorded successfully", "new_upvotes": new_upvotes}), 200
+
+    except Exception as e:
+        print(f"Downvote error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+
 
 @app.route("/api/symptomGraph", methods=["POST"])
 def symptom_graph():
