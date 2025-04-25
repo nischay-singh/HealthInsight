@@ -7,6 +7,8 @@
 /backend/node_modules/
 /backend/.env
 
+**/__pycache__/
+
 # General
 .env
 .DS_Store
@@ -14,3 +16,4 @@
 *.lock
 .vscode/
 .idea/
+*venv/
