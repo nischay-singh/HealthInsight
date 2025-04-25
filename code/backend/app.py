@@ -4,12 +4,15 @@ from flask_cors import CORS
 import os
 import mysql.connector
 from dotenv import load_dotenv
+import jwt
+import datetime
 
 load_dotenv()
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
 PORT = 5001
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 mysql_conn = mysql.connector.connect(
             host=os.getenv('MYSQL_HOST'),
@@ -99,6 +102,115 @@ def symptom_graph():
     except Exception as e:
         print(f"Database error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
+
+
+@app.route('/api/signup', methods=["POST"])
+def signup_function():
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    print("Name ", name)
+    print("email ", email)
+    print("password ", password)
+    if not name or not email or not password:
+        return jsonify({"error": "Missing fields"}), 400
+
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM User_Info WHERE Email = %s", (email,))
+        if cursor.fetchone():
+            return jsonify({"error": "Email already exists"}), 409
+
+        query = """
+        INSERT INTO User_Info (Name, Email, Password)
+        VALUES (%s, %s, %s)
+        """
+        cursor.execute(query, (name, email, password))
+        mysql_conn.commit()
+
+        token = jwt.encode(
+        {
+            'email': email,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)  # token valid for 24 hours
+        },
+        SECRET_KEY,
+        algorithm="HS256"
+        )
+
+
+        return jsonify({"token": token}), 201
+
+    except Exception as e:
+        print(f"Signup error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
+
+@app.route('/api/login', methods=["POST"])
+def login_function():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Missing email or password"}), 400
+
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor(dictionary=True)
+
+        # 🔍 Find user by email
+        query = "SELECT * FROM User_Info WHERE Email = %s"
+        cursor.execute(query, (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # 🔐 Verify password
+        if user["Password"] != password:
+            return jsonify({"error": "Incorrect password"}), 401
+
+        # 🔐 Create JWT token
+        token = jwt.encode(
+            {
+                'email': email,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+            },
+            SECRET_KEY,
+            algorithm="HS256"
+        )
+
+        return jsonify({"token": token}), 200
+
+    except Exception as e:
+        print("Login error:", e)
+        return jsonify({'error': str(e)}), 500
+
     finally:
         if 'cursor' in locals():
             cursor.close()

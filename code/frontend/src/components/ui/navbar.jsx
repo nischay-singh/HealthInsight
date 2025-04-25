@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
-
+import { useAuth } from "../../context/AuthContext";
 export function Navbar() {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <nav className="bg-secondary py-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -13,17 +15,31 @@ export function Navbar() {
           <Button variant="ghost" asChild>
             <Link to="/">Home</Link>
           </Button>
-          <Button variant="ghost" asChild>
-            <Link to="/patient-search">Patient Symptom Search</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link to="/symptom-graph">Doctor Speciality Analysis</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link to="/chatbot">Chatbot</Link>
-          </Button>
+
+          {isAuthenticated && (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/patient-search">Patient Symptom Search</Link>
+              </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/symptom-graph">Doctor Specialty Analysis</Link>
+              </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/chatbot">Chatbot</Link>
+              </Button>
+            </>
+          )}
+
           <Button variant="ghost">About Us</Button>
           <Button variant="ghost">Contact</Button>
+
+          {isAuthenticated ? (
+            <Button variant="outline" onClick={logout}>Logout</Button>
+          ) : (
+            <Button variant="default" asChild>
+              <Link to="/login">Login</Link>
+            </Button>
+          )}
         </div>
       </div>
     </nav>

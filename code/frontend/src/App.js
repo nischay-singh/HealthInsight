@@ -5,23 +5,34 @@ import Chatbot from "./pages/Chatbot";
 import PatientSearch from "./pages/PatientSearch";
 import SymptomGraph from "./pages/SymptomGraph";
 import ErrorPage from "./pages/ErrorPage";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { AuthProvider } from "./context/AuthContext.js";
+import Login from "./pages/Login.jsx";
 
 const router = createBrowserRouter([
   {
+    path: "/home",
+    element: 
+    <ProtectedRoute> <Home /> </ProtectedRoute>,
+  },{
     path: "/",
-    element: <Home />,
+    element: 
+    <ProtectedRoute> <Home /> </ProtectedRoute>,
+  },{
+    path: "/login",
+    element: <Login />
   },
   {
     path: "/chatbot",
-    element: <Chatbot />,
+    element: <ProtectedRoute> <Chatbot /> </ProtectedRoute>,
   },
   {
     path: "/patient-search",
-    element: <PatientSearch />,
+    element: <ProtectedRoute> <PatientSearch /> </ProtectedRoute>,
   },
   {
     path: "/symptom-graph",
-    element: <SymptomGraph />,
+    element: <ProtectedRoute> <SymptomGraph /> </ProtectedRoute>,
   },
   {
     path: "*",
@@ -30,7 +41,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+  <RouterProvider router={router} />
+  </AuthProvider>
+);
 }
 
 export default App;
