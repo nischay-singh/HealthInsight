@@ -46,6 +46,64 @@ export default function PatientSearch() {
     }
   };
 
+  const handleUpvote = async (recordId) => {
+    try {
+      const response = await fetch(`api/upvote?id=${recordId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Upvoted successfully");
+
+        const updatedResults = results.map((record) => {
+          if (record.recordId === recordId) {
+            return { ...record, upvotes: data.new_upvotes };
+          }
+          return record;
+        });
+        setResults(updatedResults);
+  
+      } else {
+        console.error("Upvote failed");
+      }
+    } catch (error) {
+      console.error("Error while upvoting:", error);
+    }
+  };
+
+  const handleDownvote = async (recordId) => {
+    try {
+      console.log(recordId)
+      const response = await fetch(`/api/downvote?id=${recordId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        const updatedResults = results.map((record) => {
+          if (record.recordId === recordId) {
+            return { ...record, upvotes: data.new_upvotes };
+          }
+          return record;
+        });
+        setResults(updatedResults);
+      } else {
+        console.error("Downvote failed");
+      }
+    } catch (error) {
+      console.error("Error while downvoting:", error);
+    }
+  };
+  
+  
+
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
@@ -111,6 +169,23 @@ export default function PatientSearch() {
                 <p className="text-muted-foreground italic mb-2">{record.visit_description}</p>
                 <p className="text-sm mb-2"><strong>Score:</strong> {record.score.toFixed(2)}</p>
                 <p className="text-sm text-foreground">{record.medical_transcription}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-sm text-muted-foreground">Upvotes: {record.upvotes}</p>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleUpvote(record.recordId)}
+                      className="text-xs text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
+                    >
+                      Upvote
+                    </button>
+                    <button
+                      onClick={() => handleDownvote(record.recordId)}
+                      className="text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
+                    >
+                      Downvote
+                    </button>
+                  </div>
+                </div>
             </div>
               ))}
         </div>
