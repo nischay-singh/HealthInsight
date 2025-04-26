@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "../components/ui/button";
 import { Navbar } from "../components/ui/navbar";
 import { useAuth } from "../context/AuthContext";
-export default function Login() {
+export default function Login({setEmail}) {
   const navigate = useNavigate();
 
   const [loginEmail, setLoginEmail] = useState("");
@@ -18,10 +18,11 @@ export default function Login() {
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { login } = useAuth();
-
+  const [inputEmail, setInputEmail] = useState("");
+  
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    setEmail(loginEmail)
   try {
     const response = await fetch('/api/login', {
       method: 'POST',
