@@ -25,7 +25,7 @@ export function Navbar() {
                 <Link to="/symptom-graph">Doctor Specialty Analysis</Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link to="/chatbot">Chatbot</Link>
+                <Link to="/questionanswer">Question Answer Search</Link>
               </Button>
             </>
           )}

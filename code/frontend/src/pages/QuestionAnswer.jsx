@@ -4,7 +4,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
 
-export default function Chatbot() {
+export default function QuestionAnswer() {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />

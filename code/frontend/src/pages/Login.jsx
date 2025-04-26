@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Input } from "../components/ui/input";
@@ -7,10 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "../components/ui/button";
 import { Navbar } from "../components/ui/navbar";
 import { useAuth } from "../context/AuthContext";
-export default function Login({setEmail}) {
+export default function Login() {
   const navigate = useNavigate();
 
-  const [loginEmail, setLoginEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState(() => {
+    return localStorage.getItem("email") || "";
+  });
+  
   const [loginPassword, setLoginPassword] = useState("");
 
   const [signupName, setSignupName] = useState("");
@@ -18,11 +21,15 @@ export default function Login({setEmail}) {
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { login } = useAuth();
-  const [inputEmail, setInputEmail] = useState("");
+
+
   
+  useEffect(() => {
+  localStorage.setItem("email", loginEmail);
+}, [loginEmail]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setEmail(loginEmail)
   try {
     const response = await fetch('/api/login', {
       method: 'POST',

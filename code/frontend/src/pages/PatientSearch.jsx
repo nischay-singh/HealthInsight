@@ -4,12 +4,13 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 
-export default function PatientSearch({email}) {
+export default function PatientSearch() {
   const [manualQuery, setManualQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
   const [results, setResults] = useState([]);
   const [age, setAge] = useState("");
-  console.log("EMAIL!!!!", email);
+  const email = localStorage.getItem("email");
+
   const commonSymptoms = [
     "Fever", "Cough", "Headache", "Fatigue",
     "Nausea", "Vomiting", "Shortness of breath", "Dizziness", "Sore throat"
@@ -31,12 +32,14 @@ export default function PatientSearch({email}) {
   const handleSearch = async () => {
     const finalQuery = `${manualQuery} ${selectedTags.join(" ")} ${age}`.trim();
     if (finalQuery === "") return;
+    
     console.log(finalQuery);
     try {
       const searchParams = new URLSearchParams({
         q: finalQuery,
         email: email,  // <- pass the email here
       });
+  
       const response = await fetch(`/api/patientSearch?${searchParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -20,7 +20,7 @@ export default function Home() {
           <a href="/symptom-graph">View Doctor Speciality Graph</a>
         </Button>
         <Button size="lg" variant="secondary" className="px-7 py-8 text-xl rounded-xl" asChild>
-          <a href="/chatbot">Chat with AI</a>
+          <a href="/questionanswer">Question Answer Search</a>
         </Button>
         </div>
       </div>
