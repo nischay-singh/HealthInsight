@@ -14,7 +14,6 @@ export default function KeywordSymptomExplorer() {
   ];
 
   const handleKeywordClick = async (keyword) => {
-    console.log(keyword)
     setSelectedKeyword(keyword);
     setLoading(true);
 

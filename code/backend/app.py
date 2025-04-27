@@ -244,7 +244,7 @@ def keyword_symptoms():
         )
         cursor = mysql_conn.cursor(dictionary=True)
 
-        cursor.callproc('GetKeywordCountsForQuestion', [keyword])
+        cursor.callproc('GetKeywordCountsForKeyword', [keyword])
 
         results = []
         for result in cursor.stored_results():
