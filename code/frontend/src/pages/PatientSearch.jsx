@@ -37,7 +37,7 @@ export default function PatientSearch() {
     try {
       const searchParams = new URLSearchParams({
         q: finalQuery,
-        email: email,  // <- pass the email here
+        email: email,
       });
   
       const response = await fetch(`/api/patientSearch?${searchParams.toString()}`);

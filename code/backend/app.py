@@ -25,19 +25,45 @@ mysql_conn = mysql.connector.connect(
 @app.route('/api/patientSearch', methods=['GET'])
 def search():
     query = request.args.get('q', '')
-    if not query:
-        return jsonify({'error': 'Query parameter is required'}), 400
-    
+    email = request.args.get('email', '')
+    print(email)
+    if not query or not email:
+        return jsonify({'error': 'Query and email parameters are required'}), 400
+
     try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor()
+        print(query, email)
+        insert_query = """
+        INSERT INTO Patient_Search_Log (Email, Search_text, SearchTime)
+        VALUES (%s, %s, NOW())
+        """
+        cursor.execute(insert_query, (email, query))
+        mysql_conn.commit()
+
         search = MedicalSearch()
         results = search.search(query)
+
         return jsonify({'results': results})
+
     except Exception as e:
         print(f"Search error: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
     finally:
         if 'search' in locals():
             search.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
+
 
 @app.route("/api/upvote", methods=["POST"])
 def upvote_record():
