@@ -32,32 +32,30 @@ export default function QuestionAnswer() {
   const handleSearch = async () => {
     const finalQuery = `${manualQuery} ${selectedTags.join(" ")}`.trim();
     if (finalQuery === "") return;
-    
+  
     console.log(finalQuery);
     try {
       const searchParams = new URLSearchParams({
         q: finalQuery,
         email: email,
       });
-      
-      /* here is where you will make changes */
-      const response = await fetch(`/api/patientSearch?${searchParams.toString()}`);
+  
+      const response = await fetch(`/api/questionSearch?${searchParams.toString()}`); // <-- CHANGED here
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const data = await response.json();
       console.log("Received search results:", data);
       setResults(data.results);
     } catch (error) {
       console.error("Search failed:", error.message);
     }
-    /* this is where it changes */
   };
 
-  const handleUpvote = async (recordId) => {
+  const handleUpvote = async (questionId) => {
     try {
-      const response = await fetch(`api/upvote?id=${recordId}`, {
+      const response = await fetch(`/api/questionUpvote?id=${questionId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,9 +65,9 @@ export default function QuestionAnswer() {
       if (response.ok) {
         const data = await response.json();
         console.log("Upvoted successfully");
-
+  
         const updatedResults = results.map((record) => {
-          if (record.recordId === recordId) {
+          if (record.questionId === questionId) {
             return { ...record, upvotes: data.new_upvotes };
           }
           return record;
@@ -84,10 +82,9 @@ export default function QuestionAnswer() {
     }
   };
 
-  const handleDownvote = async (recordId) => {
+  const handleDownvote = async (questionId) => {
     try {
-      console.log(recordId)
-      const response = await fetch(`/api/downvote?id=${recordId}`, {
+      const response = await fetch(`/api/questionDownvote?id=${questionId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,13 +93,16 @@ export default function QuestionAnswer() {
   
       if (response.ok) {
         const data = await response.json();
+        console.log("Downvoted successfully");
+  
         const updatedResults = results.map((record) => {
-          if (record.recordId === recordId) {
+          if (record.questionId === questionId) {
             return { ...record, upvotes: data.new_upvotes };
           }
           return record;
         });
         setResults(updatedResults);
+  
       } else {
         console.error("Downvote failed");
       }
@@ -164,38 +164,61 @@ export default function QuestionAnswer() {
         </div>
 
         {results.length > 0 && (
-        <div className="max-w-2xl mx-auto mt-10 space-y-6">
-          <h2 className="text-2xl font-semibold text-primary">Search Results</h2>
-            {results.map((record, index) => (
-            <div
-              key={index}
-              className="border border-border rounded-lg p-4 shadow-sm bg-card text-card-foreground"
-            >
-                <h3 className="text-lg font-semibold mb-2">{record.doctor_specialty.trim()}</h3>
-                <p className="text-muted-foreground italic mb-2">{record.visit_description}</p>
-                <p className="text-sm mb-2"><strong>Score:</strong> {record.score.toFixed(2)}</p>
-                <p className="text-sm text-foreground">{record.medical_transcription}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <p className="text-sm text-muted-foreground">Upvotes: {record.upvotes}</p>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleUpvote(record.recordId)}
-                      className="text-xs text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
-                    >
-                      Upvote
-                    </button>
-                    <button
-                      onClick={() => handleDownvote(record.recordId)}
-                      className="text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
-                    >
-                      Downvote
-                    </button>
-                  </div>
-                </div>
-            </div>
-              ))}
-        </div>
+  <div className="max-w-2xl mx-auto mt-10 space-y-6">
+    <h2 className="text-2xl font-semibold text-primary">Search Results</h2>
+
+    {/* Flatten the nested arrays and render each record */}
+    {results.flat().map((record, index) => (
+      <div
+        key={index}
+        className="border border-border rounded-lg p-4 shadow-sm bg-card text-card-foreground"
+      >
+        {/* Show Question if available */}
+        {record?.question && (
+          <h3 className="text-lg font-semibold mb-2">{record.question.trim()}</h3>
         )}
+
+        {/* Always show Answer */}
+        <p className="text-muted-foreground italic mb-2">
+          {record?.answer?.trim() || "No answer available."}
+        </p>
+
+        {/* Optional: show Focus Area */}
+        {record?.focus_area && (
+          <p className="text-sm mb-2">
+            <strong>Focus Area:</strong> {record.focus_area.trim()}
+          </p>
+        )}
+
+        {/* Score */}
+        <p className="text-sm mb-2">
+          <strong>Score:</strong> {record?.score?.toFixed(2) || "0.00"}
+        </p>
+
+        {/* Upvotes and buttons */}
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-sm text-muted-foreground">
+            Upvotes: {record.upvotes ?? 0}
+          </p>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => handleUpvote(record.questionId)}
+              className="text-xs text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
+            >
+              Upvote
+            </button>
+            <button
+              onClick={() => handleDownvote(record.questionId)}
+              className="text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
+            >
+              Downvote
+            </button>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
   
       </div>
     </main>

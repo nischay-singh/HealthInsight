@@ -8,7 +8,7 @@ import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { AuthProvider } from "./context/AuthContext.js";
 import Login from "./pages/Login.jsx";
-import AboutUs from "./pages/AboutUs.jsx";
+//import AboutUs from "./pages/AboutUs.jsx";
 
 function App() {
   const router = createBrowserRouter([
@@ -36,10 +36,10 @@ function App() {
       path: "/symptom-graph",
       element: <ProtectedRoute> <SymptomGraph /> </ProtectedRoute>,
     },
-    {
+    /*{
       path: "/aboutus",
       element: <ProtectedRoute> <AboutUs /> </ProtectedRoute>,
-    },
+    }, */
     {
       path: "*",
       element: <ErrorPage />,

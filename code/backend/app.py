@@ -6,6 +6,7 @@ import mysql.connector
 from dotenv import load_dotenv
 import jwt
 import datetime
+from elastic import SymptomSearch  
 
 load_dotenv()
 
@@ -39,13 +40,20 @@ def search():
             password=os.getenv('MYSQL_PASSWORD')
         )
         cursor = mysql_conn.cursor()
-        print(query, email)
-        insert_query = """
-        INSERT INTO Patient_Search_Log (Email, Search_text, SearchTime)
-        VALUES (%s, %s, NOW())
+
+        check_query = """
+        SELECT 1 FROM QA_Search_Log WHERE Email = %s AND Search_text = %s
         """
-        cursor.execute(insert_query, (email, query))
-        mysql_conn.commit()
+        cursor.execute(check_query, (email, query))
+        exists = cursor.fetchone()
+        
+        if not exists:
+            insert_query = """
+            INSERT INTO Patient_Search_Log (Email, Search_text)
+            VALUES (%s, %s)
+            """
+            cursor.execute(insert_query, (email, query))
+            mysql_conn.commit()
 
         search = MedicalSearch()
         results = search.search(query)
@@ -322,6 +330,135 @@ def login_function():
             cursor.close()
         if 'mysql_conn' in locals():
             mysql_conn.close()
+            
+@app.route('/api/questionSearch', methods=['GET'])
+def question_search():
+    query = request.args.get('q', '')
+    email = request.args.get('email', '')
+    
+    if not query or not email:
+        return jsonify({'error': 'Query and email parameters are required'}), 400
+
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor()
+
+        check_query = """
+        SELECT 1 FROM QA_Search_Log WHERE Email = %s AND Search_text = %s
+        """
+        cursor.execute(check_query, (email, query))
+        exists = cursor.fetchone()
+
+        if not exists:
+            insert_query = """
+            INSERT INTO QA_Search_Log (Email, Search_text)
+            VALUES (%s, %s)
+            """
+            cursor.execute(insert_query, (email, query))
+            mysql_conn.commit()
+
+        search = SymptomSearch()
+        results = search.search(query)
+
+        return jsonify({'results': results})
+
+    except Exception as e:
+        print(f"Question search error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if 'search' in locals():
+            search.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
+
+@app.route("/api/questionUpvote", methods=["POST"])
+def upvote_question():
+    try:
+        question_id = request.args.get('id', '')
+        if not question_id:
+            return jsonify({"error": "Missing questionId"}), 400
+
+        cursor = mysql_conn.cursor()
+
+        update_query = """
+            UPDATE Question_Answer_Symptoms
+            SET Upvotes = Upvotes + 1
+            WHERE QuestionID = %s
+        """
+        cursor.execute(update_query, (question_id,))
+        mysql_conn.commit()
+
+        select_query = """
+            SELECT Upvotes FROM Question_Answer_Symptoms
+            WHERE QuestionID = %s
+        """
+        cursor.execute(select_query, (question_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({"error": "Question not found"}), 404
+
+        new_upvotes = row[0]
+
+        search = SymptomSearch()
+        search.update_upvotes(question_id, new_upvotes)
+        search.close()
+
+        return jsonify({"message": "Upvote recorded successfully", "new_upvotes": new_upvotes}), 200
+
+    except Exception as e:
+        print(f"Question upvote error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/questionDownvote", methods=["POST"])
+def downvote_question():
+    try:
+        question_id = request.args.get('id', '')
+        if not question_id:
+            return jsonify({"error": "Missing questionId"}), 400
+
+        cursor = mysql_conn.cursor()
+
+        update_query = """
+            UPDATE Question_Answer_Symptoms
+            SET Upvotes = CASE WHEN Upvotes > 0 THEN Upvotes - 1 ELSE 0 END
+            WHERE QuestionID = %s
+        """
+        cursor.execute(update_query, (question_id,))
+        mysql_conn.commit()
+
+        select_query = """
+            SELECT Upvotes FROM Question_Answer_Symptoms
+            WHERE QuestionID = %s
+        """
+        cursor.execute(select_query, (question_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            return jsonify({"error": "Question not found"}), 404
+
+        new_upvotes = row[0]
+
+        search = SymptomSearch()
+        search.update_upvotes(question_id, new_upvotes)
+        search.close()
+
+        return jsonify({"message": "Downvote recorded successfully", "new_upvotes": new_upvotes}), 200
+
+    except Exception as e:
+        print(f"Question downvote error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+    
+    
 
 if __name__ == "__main__":
     print(f"✅ Server running at http://localhost:{PORT}")
