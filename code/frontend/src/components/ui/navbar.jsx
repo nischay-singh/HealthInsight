@@ -30,8 +30,7 @@ export function Navbar() {
             </>
           )}
 
-          <Button variant="ghost">About Us</Button>
-          <Button variant="ghost">Contact</Button>
+          <Button variant="ghost"> <Link to="/aboutus">About Us</Link></Button>
 
           {isAuthenticated ? (
             <Button variant="outline" onClick={logout}>Logout</Button>
