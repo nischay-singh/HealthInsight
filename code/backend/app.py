@@ -42,7 +42,7 @@ def search():
         cursor = mysql_conn.cursor()
 
         check_query = """
-        SELECT 1 FROM QA_Search_Log WHERE Email = %s AND Search_text = %s
+        SELECT 1 FROM Patient_Search_Log WHERE Email = %s AND Search_text = %s
         """
         cursor.execute(check_query, (email, query))
         exists = cursor.fetchone()
@@ -71,7 +71,6 @@ def search():
             cursor.close()
         if 'mysql_conn' in locals():
             mysql_conn.close()
-
 
 @app.route("/api/upvote", methods=["POST"])
 def upvote_record():
@@ -152,6 +151,116 @@ def downvote_record():
         print(f"Downvote error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/patient-search-log', methods=['GET'])
+def get_patient_search_logs():
+    email = request.args.get('email', '')
+
+    if not email:
+        return jsonify({'error': 'Email parameter is required'}), 400
+
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor(dictionary=True)
+
+        query = """
+        SELECT Email, Search_text
+        FROM Patient_Search_Log
+        WHERE Email = %s
+        LIMIT 3
+        """
+        cursor.execute(query, (email,))
+        logs = cursor.fetchall()
+
+        return jsonify(logs), 200
+
+    except Exception as e:
+        print(f"Patient log fetch error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
+
+@app.route('/api/qa-search-log', methods=['GET'])
+def get_qa_search_logs():
+    email = request.args.get('email', '')
+
+    if not email:
+        return jsonify({'error': 'Email parameter is required'}), 400
+
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor(dictionary=True)
+
+        query = """
+        SELECT Email, Search_text
+        FROM QA_Search_Log
+        WHERE Email = %s
+        LIMIT 3
+        """
+        cursor.execute(query, (email,))
+        logs = cursor.fetchall()
+
+        return jsonify(logs), 200
+
+    except Exception as e:
+        print(f"QA log fetch error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
+
+@app.route('/api/keyword-symptoms', methods=['GET'])
+def keyword_symptoms():
+    keyword = request.args.get('keyword', '')
+
+    if not keyword:
+        return jsonify({'error': 'Keyword parameter is required'}), 400
+
+    try:
+        mysql_conn = mysql.connector.connect(
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASES'),
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD')
+        )
+        cursor = mysql_conn.cursor(dictionary=True)
+
+        cursor.callproc('GetKeywordCountsForQuestion', [keyword])
+
+        results = []
+        for result in cursor.stored_results():
+            results.extend(result.fetchall())
+
+        return jsonify({'results': results}), 200
+
+    except Exception as e:
+        print(f"Keyword symptom fetch error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'mysql_conn' in locals():
+            mysql_conn.close()
 
 
 @app.route("/api/symptomGraph", methods=["POST"])

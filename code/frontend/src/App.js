@@ -1,4 +1,4 @@
-import React, {useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import QuestionAnswer from "./pages/QuestionAnswer.jsx";
@@ -8,7 +8,7 @@ import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { AuthProvider } from "./context/AuthContext.js";
 import Login from "./pages/Login.jsx";
-//import AboutUs from "./pages/AboutUs.jsx";
+import KeywordSymptomExplorer from "./pages/KeywordSymptomExplorer.jsx"; // <-- Added this
 
 function App() {
   const router = createBrowserRouter([
@@ -16,13 +16,15 @@ function App() {
       path: "/home",
       element: 
       <ProtectedRoute> <Home /> </ProtectedRoute>,
-    },{
+    },
+    {
       path: "/",
       element: 
       <ProtectedRoute> <Home /> </ProtectedRoute>,
-    },{
+    },
+    {
       path: "/login",
-      element: <Login/>
+      element: <Login />
     },
     {
       path: "/questionanswer",
@@ -30,16 +32,16 @@ function App() {
     },
     {
       path: "/patient-search",
-      element: <ProtectedRoute> <PatientSearch/> </ProtectedRoute>,
+      element: <ProtectedRoute> <PatientSearch /> </ProtectedRoute>,
     },
     {
       path: "/symptom-graph",
       element: <ProtectedRoute> <SymptomGraph /> </ProtectedRoute>,
     },
-    /*{
-      path: "/aboutus",
-      element: <ProtectedRoute> <AboutUs /> </ProtectedRoute>,
-    }, */
+    {
+      path: "/keyword-symptom-explorer",
+      element: <ProtectedRoute> <KeywordSymptomExplorer /> </ProtectedRoute>,
+    },
     {
       path: "*",
       element: <ErrorPage />,

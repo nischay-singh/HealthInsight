@@ -27,6 +27,9 @@ export function Navbar() {
               <Button variant="ghost" asChild>
                 <Link to="/questionanswer">Question Answer Search</Link>
               </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/keyword-symptom-explorer">Keyword Symptom Explorer</Link>
+              </Button>
             </>
           )}
 

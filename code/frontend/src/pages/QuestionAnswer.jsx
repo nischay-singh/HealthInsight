@@ -1,20 +1,39 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "../components/ui/navbar";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 
-
 export default function QuestionAnswer() {
   const [manualQuery, setManualQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
   const [results, setResults] = useState([]);
+  const [logs, setLogs] = useState([]);
   const email = localStorage.getItem("email");
 
   const commonSymptoms = [
     "Fever", "Cough", "Headache", "Fatigue",
     "Nausea", "Vomiting", "Shortness of breath", "Dizziness", "Sore throat"
   ];
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const response = await fetch(`/api/qa-search-log?email=${email}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setLogs(data);
+      } catch (error) {
+        console.error("Failed to fetch search logs:", error.message);
+      }
+    };
+
+    if (email) {
+      fetchLogs();
+    }
+  }, [email]);
 
   const handleBadgeClick = (symptom) => {
     const isSelected = selectedTags.includes(symptom);
@@ -32,22 +51,21 @@ export default function QuestionAnswer() {
   const handleSearch = async () => {
     const finalQuery = `${manualQuery} ${selectedTags.join(" ")}`.trim();
     if (finalQuery === "") return;
-  
-    console.log(finalQuery);
+
     try {
       const searchParams = new URLSearchParams({
         q: finalQuery,
         email: email,
       });
-  
-      const response = await fetch(`/api/questionSearch?${searchParams.toString()}`); // <-- CHANGED here
+
+      const response = await fetch(`/api/questionSearch?${searchParams.toString()}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-      console.log("Received search results:", data);
       setResults(data.results);
+      setLogs([]);
     } catch (error) {
       console.error("Search failed:", error.message);
     }
@@ -61,11 +79,10 @@ export default function QuestionAnswer() {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Upvoted successfully");
-  
+
         const updatedResults = results.map((record) => {
           if (record.questionId === questionId) {
             return { ...record, upvotes: data.new_upvotes };
@@ -73,7 +90,7 @@ export default function QuestionAnswer() {
           return record;
         });
         setResults(updatedResults);
-  
+
       } else {
         console.error("Upvote failed");
       }
@@ -90,11 +107,10 @@ export default function QuestionAnswer() {
           'Content-Type': 'application/json',
         }
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Downvoted successfully");
-  
+
         const updatedResults = results.map((record) => {
           if (record.questionId === questionId) {
             return { ...record, upvotes: data.new_upvotes };
@@ -102,7 +118,6 @@ export default function QuestionAnswer() {
           return record;
         });
         setResults(updatedResults);
-  
       } else {
         console.error("Downvote failed");
       }
@@ -110,15 +125,13 @@ export default function QuestionAnswer() {
       console.error("Error while downvoting:", error);
     }
   };
-  
-  
 
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto py-16">
         <h1 className="text-4xl font-bold mb-8 text-center text-primary">
-          Question Answer 
+          Question Answer
         </h1>
         <p className="mb-6 text-center">This tool allows you to search for previous question answers from the database</p>
         <div className="max-w-2xl mx-auto space-y-6">
@@ -163,63 +176,65 @@ export default function QuestionAnswer() {
           </div>
         </div>
 
-        {results.length > 0 && (
-  <div className="max-w-2xl mx-auto mt-10 space-y-6">
-    <h2 className="text-2xl font-semibold text-primary">Search Results</h2>
-
-    {/* Flatten the nested arrays and render each record */}
-    {results.flat().map((record, index) => (
-      <div
-        key={index}
-        className="border border-border rounded-lg p-4 shadow-sm bg-card text-card-foreground"
-      >
-        {/* Show Question if available */}
-        {record?.question && (
-          <h3 className="text-lg font-semibold mb-2">{record.question.trim()}</h3>
-        )}
-
-        {/* Always show Answer */}
-        <p className="text-muted-foreground italic mb-2">
-          {record?.answer?.trim() || "No answer available."}
-        </p>
-
-        {/* Optional: show Focus Area */}
-        {record?.focus_area && (
-          <p className="text-sm mb-2">
-            <strong>Focus Area:</strong> {record.focus_area.trim()}
-          </p>
-        )}
-
-        {/* Score */}
-        <p className="text-sm mb-2">
-          <strong>Score:</strong> {record?.score?.toFixed(2) || "0.00"}
-        </p>
-
-        {/* Upvotes and buttons */}
-        <div className="flex items-center justify-between mt-2">
-          <p className="text-sm text-muted-foreground">
-            Upvotes: {record.upvotes ?? 0}
-          </p>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => handleUpvote(record.questionId)}
-              className="text-xs text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
-            >
-              Upvote
-            </button>
-            <button
-              onClick={() => handleDownvote(record.questionId)}
-              className="text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
-            >
-              Downvote
-            </button>
+        {results.length === 0 && logs.length > 0 && (
+          <div className="max-w-2xl mx-auto mt-10 space-y-6">
+            <h2 className="text-2xl font-semibold text-primary">Your Recent Searches</h2>
+            {logs.map((log, index) => (
+              <div
+                key={index}
+                className="border border-border rounded-lg p-4 shadow-sm bg-card text-card-foreground"
+              >
+                <p className="text-muted-foreground italic">{log.Search_text}</p>
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
-    ))}
-  </div>
-)}
-  
+        )}
+
+        {results.length > 0 && (
+          <div className="max-w-2xl mx-auto mt-10 space-y-6">
+            <h2 className="text-2xl font-semibold text-primary">Search Results</h2>
+            {results.flat().map((record, index) => (
+              <div
+                key={index}
+                className="border border-border rounded-lg p-4 shadow-sm bg-card text-card-foreground"
+              >
+                {record?.question && (
+                  <h3 className="text-lg font-semibold mb-2">{record.question.trim()}</h3>
+                )}
+                <p className="text-muted-foreground italic mb-2">
+                  {record?.answer?.trim() || "No answer available."}
+                </p>
+                {record?.focus_area && (
+                  <p className="text-sm mb-2">
+                    <strong>Focus Area:</strong> {record.focus_area.trim()}
+                  </p>
+                )}
+                <p className="text-sm mb-2">
+                  <strong>Score:</strong> {record?.score?.toFixed(2) || "0.00"}
+                </p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-sm text-muted-foreground">
+                    Upvotes: {record.upvotes ?? 0}
+                  </p>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleUpvote(record.questionId)}
+                      className="text-xs text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
+                    >
+                      Upvote
+                    </button>
+                    <button
+                      onClick={() => handleDownvote(record.questionId)}
+                      className="text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded"
+                    >
+                      Downvote
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
