@@ -370,7 +370,7 @@ def signup_function():
         token = jwt.encode(
         {
             'email': email,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)  # token valid for 24 hours
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         },
         SECRET_KEY,
         algorithm="HS256"
@@ -408,7 +408,6 @@ def login_function():
         )
         cursor = mysql_conn.cursor(dictionary=True)
 
-        # 🔍 Find user by email
         query = "SELECT * FROM User_Info WHERE Email = %s"
         cursor.execute(query, (email,))
         user = cursor.fetchone()
@@ -416,11 +415,9 @@ def login_function():
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        # 🔐 Verify password
         if user["Password"] != password:
             return jsonify({"error": "Incorrect password"}), 401
 
-        # 🔐 Create JWT token
         token = jwt.encode(
             {
                 'email': email,
@@ -599,5 +596,5 @@ def downvote_question():
     
 
 if __name__ == "__main__":
-    print(f"✅ Server running at http://localhost:{PORT}")
+    print(f"Server running at http://localhost:{PORT}")
     app.run(port=PORT) 
