@@ -300,7 +300,7 @@ def symptom_graph():
         cursor.execute(query, (search_term, search_term))
         results = cursor.fetchall()
         cursor.execute("COMMIT")
-        
+
         if not results:
             print("No results found for keyword:", keyword)
             return jsonify({
@@ -535,6 +535,8 @@ def upvote_question():
 def get_focus_areas():
     try:
         cursor = mysql_conn.cursor(dictionary=True)
+        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED")
+        cursor.execute("START TRANSACTION READ ONLY")
         cursor.execute('''
             SELECT 
               TRIM(FocusArea) AS FocusArea,
@@ -548,6 +550,7 @@ def get_focus_areas():
             LIMIT 10;
         ''')
         results = cursor.fetchall()
+        cursor.execute("COMMIT")
         return jsonify({'focusAreas': results})
     except Exception as e:
         print("Error:", e)
