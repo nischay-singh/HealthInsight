@@ -281,7 +281,8 @@ def symptom_graph():
         )
         
         cursor = mysql_conn.cursor(dictionary=True)
-        
+        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED")
+        cursor.execute("START TRANSACTION READ ONLY")
         query = """
         SELECT DoctorSpecialty, COUNT(*) AS NumRecords
         FROM Patient_Diagnosis_Records
@@ -298,6 +299,7 @@ def symptom_graph():
         search_term = f'%{keyword}%'
         cursor.execute(query, (search_term, search_term))
         results = cursor.fetchall()
+        cursor.execute("COMMIT")
         
         if not results:
             print("No results found for keyword:", keyword)
