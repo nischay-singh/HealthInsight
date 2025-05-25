@@ -94,9 +94,3 @@ npm start
   - Cloud Storage - File storage
   - Cloud SQL - Managed database
   - Cloud Functions - Serverless functions
-
-### DevOps & Tools
-- Docker - Containerization
-- GitHub Actions - CI/CD
-- Jest - Testing framework
-- ESLint - Code linting
