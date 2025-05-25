@@ -86,7 +86,6 @@ npm start
 ### Database & Search
 - MongoDB - Primary database
 - Elasticsearch - Search engine and analytics
-- Redis - Caching layer
 
 ### Cloud Infrastructure
 - Google Cloud Platform (GCP)
