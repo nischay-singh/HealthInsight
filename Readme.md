@@ -17,6 +17,8 @@ HealthInsight/
 - Health metrics tracking and visualization
 - Personalized health insights and recommendations
 - Interactive dashboard for health monitoring
+- Advanced search capabilities with Elasticsearch
+- Scalable cloud infrastructure with Google Cloud Platform
 
 ## Getting Started
 
@@ -25,6 +27,8 @@ HealthInsight/
 - Node.js (v14 or higher)
 - npm or yarn
 - MongoDB
+- Elasticsearch
+- Google Cloud Platform account
 
 ### Installation
 
@@ -49,6 +53,7 @@ npm install
 4. Set up environment variables
 - Create `.env` files in both frontend and backend directories
 - Follow the `.env.example` files for required variables
+- Configure GCP credentials and Elasticsearch connection details
 
 ### Running the Application
 
@@ -66,11 +71,32 @@ npm start
 
 ## Technologies Used
 
-- Frontend: React.js, Material-UI
-- Backend: Node.js, Express.js
-- Database: MongoDB
-- Authentication: JWT
+### Frontend
+- React.js - UI framework
+- Material-UI - Component library
+- Redux - State management
+- Axios - HTTP client
 
-## License
+### Backend
+- Node.js - Runtime environment
+- Express.js - Web framework
+- JWT - Authentication
+- Mongoose - MongoDB ODM
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Database & Search
+- MongoDB - Primary database
+- Elasticsearch - Search engine and analytics
+- Redis - Caching layer
+
+### Cloud Infrastructure
+- Google Cloud Platform (GCP)
+  - Cloud Run - Container hosting
+  - Cloud Storage - File storage
+  - Cloud SQL - Managed database
+  - Cloud Functions - Serverless functions
+
+### DevOps & Tools
+- Docker - Containerization
+- GitHub Actions - CI/CD
+- Jest - Testing framework
+- ESLint - Code linting
