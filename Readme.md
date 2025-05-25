@@ -1,16 +1,76 @@
-# Team027-bigDogs
-This is a template for CS411 project repository. Please make sure that your title follows the convention: [TeamID]-[YourTeamName]. All TeamID should have a three digit coding (i.e. if you are team 20, you should have `team020` as your ID.). You should also make sure that your url for this repository is [sp25-cs411-team000-teamname.git] so TAs can correctly clone your repository and keep them up-to-date.
+# HealthInsight
 
-Once you setup your project, please remember to submit your team formation to the team form.
+A comprehensive health and wellness platform that helps users track and improve their health metrics.
 
-## Permission
-You should make sure you allow TAs to access your repository. You can add TA(s) as a collaborator to your repository.
+## Project Structure
 
-## Preparing for your release
-Eash submission should be in it's own [release](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases). Release are specific freezes to your repository. You should submit your commit hash on canvas or google sheet. When tagging your stage, please use the tag `stage.x` where x is the number to represent the stage.
+```
+HealthInsight/
+├── frontend/     # React frontend application
+├── backend/      # Node.js/Express backend server
+└── README.md     # Project documentation
+```
 
-## Keeping things up-to-date
-You should make sure you keep your project root files up-to-date. Information for each file/folders are explained.
+## Features
 
-## Code Contribution
-Individual code contribution will be used to evaluate individual contribution to the project.
+- User authentication and profile management
+- Health metrics tracking and visualization
+- Personalized health insights and recommendations
+- Interactive dashboard for health monitoring
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm or yarn
+- MongoDB
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/HealthInsight.git
+cd HealthInsight
+```
+
+2. Install frontend dependencies
+```bash
+cd frontend
+npm install
+```
+
+3. Install backend dependencies
+```bash
+cd ../backend
+npm install
+```
+
+4. Set up environment variables
+- Create `.env` files in both frontend and backend directories
+- Follow the `.env.example` files for required variables
+
+### Running the Application
+
+1. Start the backend server
+```bash
+cd backend
+npm start
+```
+
+2. Start the frontend development server
+```bash
+cd frontend
+npm start
+```
+
+## Technologies Used
+
+- Frontend: React.js, Material-UI
+- Backend: Node.js, Express.js
+- Database: MongoDB
+- Authentication: JWT
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
