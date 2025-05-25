@@ -73,8 +73,6 @@ npm start
 
 ### Frontend
 - React.js - UI framework
-- Material-UI - Component library
-- Redux - State management
 - Axios - HTTP client
 
 ### Backend
